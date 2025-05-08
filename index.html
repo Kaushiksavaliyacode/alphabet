@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alphabet Coloring Fun</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF9E7D;
+            --secondary: #4ECDC4;
+            --accent: #FF6B6B;
+            --light: #FFF8F0;
+            --dark: #2E5266;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: var(--light);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: radial-gradient(circle at 10% 20%, rgba(255,158,125,0.1) 0%, rgba(78,205,196,0.1) 90%);
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            background-color: white;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(46, 82, 102, 0.2);
+            padding: 30px;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+            border: 3px solid white;
+        }
+
+        .app-container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            animation: rainbow 8s linear infinite;
+        }
+
+        h1 {
+            color: var(--dark);
+            margin: 15px 0 25px;
+            font-family: 'Fredoka One', cursive;
+            font-size: 2.2rem;
+            text-shadow: 3px 3px 0 rgba(255, 158, 125, 0.3);
+            position: relative;
+            display: inline-block;
+            animation: bounce 1s ease infinite alternate;
+        }
+
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+            border-radius: 3px;
+        }
+
+        .controls {
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .control-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .color-picker-container:hover {
+            transform: translateY(-3px);
+        }
+
+        .color-picker-label {
+            font-weight: bold;
+            color: var(--dark);
+        }
+
+        #colorSelector {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        #colorSelector:hover {
+            transform: scale(1.1);
+        }
+
+        button {
+            background-color: var(--secondary);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Comic Neue', cursive;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        button:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        button:hover {
+            background-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #clearBtn {
+            background-color: var(--accent);
+        }
+
+        #clearBtn:hover {
+            background-color: #ff5252;
+        }
+
+        .letter-selector {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px 15px;
+            border-radius: 50px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        #currentLetter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--dark);
+            margin: 0 15px;
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            line-height: 50px;
+            background-color: white;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            animation: pulse 2s infinite;
+        }
+
+        .canvas-container {
+            margin: 0 auto;
+            border: 3px dashed var(--secondary);
+            border-radius: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .canvas-container:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        canvas {
+            background-color: white;
+            border-radius: 15px;
+            display: block;
+            margin: 0 auto;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="%232E5266" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="%232E5266"/></svg>') 12 12, pointer;
+            transition: transform 0.3s;
+        }
+
+        canvas:hover {
+            transform: scale(1.01);
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            opacity: 0;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 1;
+            }
+            20% {
+                transform: scale(25, 25);
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: scale(40, 40);
+            }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 500px) {
+            .app-container {
+                padding: 20px;
+                border-radius: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .controls {
+                gap: 10px;
+            }
+            
+            #coloringCanvas {
+                width: 280px;
+                height: 280px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <h1>Alphabet Coloring Fun!</h1>
+        <div class="controls">
+            <div class="control-group">
+                <div class="color-picker-container">
+                    <span class="color-picker-label">Color:</span>
+                    <input type="color" id="colorSelector" value="#FF6B6B" title="Choose your color">
+                </div>
+                <button id="clearBtn">Clear Letter</button>
+            </div>
+            <div class="control-group">
+                <div class="letter-selector">
+                    <button id="prevLetter">←</button>
+                    <span id="currentLetter">A</span>
+                    <button id="nextLetter">→</button>
+                </div>
+            </div>
+        </div>
+        <div class="canvas-container">
+            <canvas id="coloringCanvas" width="350" height="350"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('coloringCanvas');
+            const ctx = canvas.getContext('2d');
+            const colorSelector = document.getElementById('colorSelector');
+            const clearBtn = document.getElementById('clearBtn');
+            const prevLetterBtn = document.getElementById('prevLetter');
+            const nextLetterBtn = document.getElementById('nextLetter');
+            const currentLetterSpan = document.getElementById('currentLetter');
+            
+            let currentLetter = 'A';
+            let isDrawing = false;
+            
+            // Alphabet array
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+            
+            // Initialize the app
+            function init() {
+                drawLetter(currentLetter);
+                setupEventListeners();
+            }
+            
+            // Set up event listeners
+            function setupEventListeners() {
+                // Drawing on canvas
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                
+                // Touch support for mobile devices
+                canvas.addEventListener('touchstart', handleTouchStart);
+                canvas.addEventListener('touchmove', handleTouchMove);
+                canvas.addEventListener('touchend', handleTouchEnd);
+                
+                // Controls
+                clearBtn.addEventListener('click', clearCanvas);
+                prevLetterBtn.addEventListener('click', showPreviousLetter);
+                nextLetterBtn.addEventListener('click', showNextLetter);
+            }
+            
+            // Draw the current letter
+            function drawLetter(letter) {
+                clearCanvas();
+                currentLetter = letter;
+                currentLetterSpan.textContent = letter;
+                
+                ctx.font = 'bold 200px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                ctx.fillText(letter, canvas.width / 2, canvas.height / 2);
+            }
+            
+            // Drawing functions
+            function startDrawing(e) {
+                isDrawing = true;
+                draw(e);
+            }
+            
+            function draw(e) {
+                if (!isDrawing) return;
+                
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                ctx.fillStyle = colorSelector.value;
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            function stopDrawing() {
+                isDrawing = false;
+            }
+            
+            // Touch event handlers
+            function handleTouchStart(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousedown', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }
+            
+            function handleTouchMove(e) {
+                e.preventDefault();
+                const touch = e.touches[0];
+                const mouseEvent = new MouseEvent('mousemove', {
+                    clientX: touch.clientX,
+                    clientY: touch.clientY
+                });
+                canvas.dispatchEvent(mouseEvent);
+            }
+            
+            function handleTouchEnd(e) {
+                e.preventDefault();
+                const mouseEvent = new MouseEvent('mouseup');
+                canvas.dispatchEvent(mouseEvent);
+            }
+            
+            // Clear the canvas
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+            
+            // Letter navigation
+            function showNextLetter() {
+                const currentIndex = alphabet.indexOf(currentLetter);
+                const nextIndex = (currentIndex + 1) % alphabet.length;
+                drawLetter(alphabet[nextIndex]);
+            }
+            
+            function showPreviousLetter() {
+                const currentIndex = alphabet.indexOf(currentLetter);
+                const prevIndex = (currentIndex - 1 + alphabet.length) % alphabet.length;
+                drawLetter(alphabet[prevIndex]);
+            }
+            
+            // Initialize the app
+            init();
+        });
+    </script>
+</body>
+</html>
